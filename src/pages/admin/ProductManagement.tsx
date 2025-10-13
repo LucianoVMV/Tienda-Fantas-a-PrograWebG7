@@ -1,40 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import './ProductManagement.css';
-import type { Product } from '../../data/productos'; // Asegúrate que esta ruta es correcta
+import type { Product } from '../../data/productos';
 
-const API_URL = 'http://localhost:5000/api';
+// Definimos una interface simple para las categorías aquí mismo
+interface Category {
+  id: number;
+  name: string;
+}
+
+const API_BASE_URL = 'http://localhost:5001/api';
 
 export const ProductManagement: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   
-  // Estados para el modal de "Agregar"
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  
-  // Estados para el modal de "Editar"
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
 
-  // Estados para los campos del formulario
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
 
-  // Cargar productos desde el backend
-  const fetchProducts = () => {
-    fetch(`${API_URL}/admin/products`)
-      .then(res => res.json())
-      .then(data => setProducts(data))
-      .catch(error => console.error("Error al cargar productos:", error));
+  const fetchAllData = () => {
+    Promise.all([
+      fetch(`${API_BASE_URL}/admin/products`),
+      fetch(`${API_BASE_URL}/categories`)
+    ])
+    .then(async ([productsRes, categoriesRes]) => {
+      const productsData = await productsRes.json();
+      const categoriesData = await categoriesRes.json();
+      setProducts(productsData);
+      setCategories(categoriesData);
+    })
+    .catch(error => console.error("Error al cargar datos iniciales:", error));
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchAllData();
   }, []);
 
   const resetForm = () => {
     setName(''); setCategory(''); setPrice(''); setDescription(''); setImage('');
+    setCurrentProduct(null);
   };
 
   const openAddModal = () => {
@@ -56,14 +66,14 @@ export const ProductManagement: React.FC = () => {
     e.preventDefault();
     const newProduct = { name, category, price, description, image };
     
-    const response = await fetch(`${API_URL}/products`, {
+    const response = await fetch(`${API_BASE_URL}/products`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newProduct),
     });
     
     if (response.ok) {
-      fetchProducts(); // Recargamos la lista de productos
+      fetchAllData();
       setIsAddModalOpen(false);
     } else {
       console.error("Error al agregar el producto");
@@ -76,14 +86,14 @@ export const ProductManagement: React.FC = () => {
 
     const updatedProductData = { name, category, price, description, image };
 
-    const response = await fetch(`${API_URL}/products/${currentProduct.id}`, {
+    const response = await fetch(`${API_BASE_URL}/products/${currentProduct.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedProductData),
     });
 
     if (response.ok) {
-      fetchProducts(); // Recargamos la lista
+      fetchAllData();
       setIsEditModalOpen(false);
     } else {
       console.error("Error al editar el producto");
@@ -91,12 +101,12 @@ export const ProductManagement: React.FC = () => {
   };
 
   const handleToggleActive = async (productId: number) => {
-    const response = await fetch(`${API_URL}/products/${productId}`, {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
       method: 'DELETE',
     });
 
     if (response.ok) {
-      fetchProducts(); // Recargamos la lista
+      fetchAllData();
     } else {
       console.error("Error al cambiar el estado del producto");
     }
@@ -117,23 +127,20 @@ export const ProductManagement: React.FC = () => {
             <th>Nombre</th>
             <th>Categoría</th>
             <th>Precio</th>
-            <th>Estado</th> {/* <-- 1. NUEVA COLUMNA */}
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {products.map((product) => (
-            // 2. AÑADIMOS UNA CLASE SI EL PRODUCTO ESTÁ INACTIVO
             <tr key={product.id} className={product.isActive === false ? 'product-inactive' : ''}>
               <td>{product.id}</td>
               <td>{product.name}</td>
               <td>{product.category || 'N/A'}</td>
               <td>S/ {product.price.toFixed(2)}</td>
-              {/* 3. MOSTRAMOS EL TEXTO DEL ESTADO */}
               <td>{product.isActive === false ? 'Inactivo' : 'Activo'}</td>
               <td className="action-buttons">
                 <button className="admin-button" onClick={() => openEditModal(product)}>Editar</button>
-                {/* 4. BOTÓN INTELIGENTE QUE CAMBIA */}
                 <button 
                   className={`admin-button ${product.isActive === false ? 'success' : 'danger'}`}
                   onClick={() => handleToggleActive(product.id)}
@@ -145,7 +152,6 @@ export const ProductManagement: React.FC = () => {
           ))}
         </tbody>
       </table>
-
 
       {/* --- MODAL DE AGREGAR --- */}
       {isAddModalOpen && (
@@ -159,7 +165,12 @@ export const ProductManagement: React.FC = () => {
               </div>
               <div className="form-group">
                 <label>Categoría</label>
-                <input type="text" value={category} onChange={e => setCategory(e.target.value)} />
+                <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+                    <option value="" disabled>Selecciona una categoría</option>
+                    {categories.map(cat => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                    ))}
+                </select>
               </div>
               <div className="form-group">
                 <label>Precio</label>
@@ -194,7 +205,12 @@ export const ProductManagement: React.FC = () => {
               </div>
               <div className="form-group">
                 <label>Categoría</label>
-                <input type="text" value={category} onChange={e => setCategory(e.target.value)} />
+                <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+                    <option value="" disabled>Selecciona una categoría</option>
+                    {categories.map(cat => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                    ))}
+                </select>
               </div>
               <div className="form-group">
                 <label>Precio</label>
