@@ -5,6 +5,12 @@ import { CartSidebar } from "./components/CarritoSidebar";
 import { Home } from "./pages/Home";
 import { Checkout } from "./pages/Checkout";
 import { OrderComplete } from "./pages/OrderComplete";
+import UserList from "./pages/Admin/UserList";
+import UserDetail from "./pages/Admin/UserDetail";
+import OrderDetail from "./pages/Admin/OrderDetail";
+import OrderList from "./pages/Admin/OrderList";
+
+
 
 const appContainer: React.CSSProperties = {
   minHeight: "100vh",
@@ -37,6 +43,7 @@ export default function App() {
             <nav style={{ display: "flex", gap: 10 }}>
               <Link to="/" style={{ color: "#f7efe0", textDecoration: "none", padding: "8px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)" }}>Tienda</Link>
               <Link to="/checkout" style={{ color: "#f7efe0", textDecoration: "none", padding: "8px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)" }}>Checkout</Link>
+              <Link to="/admin/usuarios" style={{ color: "#f7efe0", textDecoration: "none", padding: "8px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)" }}>Admin</Link>
             </nav>
           </header>
 
@@ -47,6 +54,11 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-complete" element={<OrderComplete />} />
+
+              <Route path="/admin/usuarios" element={<UserList />} />
+              <Route path="/admin/usuarios/:id" element={<UserDetail />} />
+              <Route path="/admin/ordenes" element={<OrderList />} />
+              <Route path="/admin/ordenes/:id" element={<OrderDetail />} />
             </Routes>
           </main>
         </div>
