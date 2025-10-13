@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useCart } from "../context/GestionCarrito";
+import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 interface ShippingData {
@@ -12,6 +13,7 @@ interface ShippingData {
 
 export const Checkout: React.FC = () => {
   const { items, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [paymentMethod, setPaymentMethod] = useState<'qr'|'card'>('qr');
@@ -32,14 +34,30 @@ export const Checkout: React.FC = () => {
       setErrors("El carrito está vacío.");
       return;
     }
+    if (!user) {
+      setErrors("No hay usuario activo.");
+      return;
+    }
 
     const order = {
       id: String(Date.now()),
+      date: new Date().toLocaleString(),
+      status: "Enviando",
       items,
-      shipping,
-      paymentMethod,
       totals: { subtotal, shipping: shippingCost, total }
     };
+
+    // --- Guardar la orden en localStorage ---
+    const key = `orders_${user.email}`;
+    let savedOrders: any[] = [];
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved) savedOrders = JSON.parse(saved);
+    } catch { savedOrders = []; }
+
+    savedOrders.push(order);
+    localStorage.setItem(key, JSON.stringify(savedOrders));
+    // -----------------------------------------
 
     clearCart();
     navigate('/order-complete', { state: { order } });
