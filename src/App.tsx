@@ -5,6 +5,10 @@ import { CartSidebar } from "./components/CarritoSidebar";
 import { Home } from "./pages/Home";
 import { Checkout } from "./pages/Checkout";
 import { OrderComplete } from "./pages/OrderComplete";
+import { Dashboard } from "./pages/admin/Dashboard";
+import { AdminLayout } from "./pages/admin/AdminLayout";
+import { ProductManagement } from "./pages/admin/ProductManagement";
+import { CategoryManagement } from "./pages/admin/CategoryManagement";
 
 const appContainer: React.CSSProperties = {
   minHeight: "100vh",
@@ -47,6 +51,11 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-complete" element={<OrderComplete />} />
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="products" element={<ProductManagement />} />
+                <Route path="categories" element={<CategoryManagement />} />
+              </Route>
             </Routes>
           </main>
         </div>
