@@ -9,6 +9,12 @@ import { Dashboard } from "./pages/admin/Dashboard";
 import { AdminLayout } from "./pages/admin/AdminLayout";
 import { ProductManagement } from "./pages/admin/ProductManagement";
 import { CategoryManagement } from "./pages/admin/CategoryManagement";
+import UserList from "./pages/Admin/UserList";
+import UserDetail from "./pages/Admin/UserDetail";
+import OrderDetail from "./pages/Admin/OrderDetail";
+import OrderList from "./pages/Admin/OrderList";
+
+
 
 const appContainer: React.CSSProperties = {
   minHeight: "100vh",
@@ -41,6 +47,7 @@ export default function App() {
             <nav style={{ display: "flex", gap: 10 }}>
               <Link to="/" style={{ color: "#f7efe0", textDecoration: "none", padding: "8px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)" }}>Tienda</Link>
               <Link to="/checkout" style={{ color: "#f7efe0", textDecoration: "none", padding: "8px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)" }}>Checkout</Link>
+              <Link to="/admin/usuarios" style={{ color: "#f7efe0", textDecoration: "none", padding: "8px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)" }}>Admin</Link>
             </nav>
           </header>
 
@@ -56,6 +63,11 @@ export default function App() {
                 <Route path="products" element={<ProductManagement />} />
                 <Route path="categories" element={<CategoryManagement />} />
               </Route>
+
+              <Route path="/admin/usuarios" element={<UserList />} />
+              <Route path="/admin/usuarios/:id" element={<UserDetail />} />
+              <Route path="/admin/ordenes" element={<OrderList />} />
+              <Route path="/admin/ordenes/:id" element={<OrderDetail />} />
             </Routes>
           </main>
         </div>
