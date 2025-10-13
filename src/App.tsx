@@ -5,6 +5,10 @@ import { CartSidebar } from "./components/CarritoSidebar";
 import { Home } from "./pages/Home";
 import { Checkout } from "./pages/Checkout";
 import { OrderComplete } from "./pages/OrderComplete";
+import { Dashboard } from "./pages/admin/Dashboard";
+import { AdminLayout } from "./pages/admin/AdminLayout";
+import { ProductManagement } from "./pages/admin/ProductManagement";
+import { CategoryManagement } from "./pages/admin/CategoryManagement";
 import UserList from "./pages/Admin/UserList";
 import UserDetail from "./pages/Admin/UserDetail";
 import OrderDetail from "./pages/Admin/OrderDetail";
@@ -54,6 +58,11 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-complete" element={<OrderComplete />} />
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="products" element={<ProductManagement />} />
+                <Route path="categories" element={<CategoryManagement />} />
+              </Route>
 
               <Route path="/admin/usuarios" element={<UserList />} />
               <Route path="/admin/usuarios/:id" element={<UserDetail />} />
