@@ -9,11 +9,10 @@ import { Dashboard } from "./pages/admin/Dashboard";
 import { AdminLayout } from "./pages/admin/AdminLayout";
 import { ProductManagement } from "./pages/admin/ProductManagement";
 import { CategoryManagement } from "./pages/admin/CategoryManagement";
-import UserList from "./pages/Admin/UserList";
-import UserDetail from "./pages/Admin/UserDetail";
-import OrderDetail from "./pages/Admin/OrderDetail";
-import OrderList from "./pages/Admin/OrderList";
-
+import UserList from "./pages/admin/UserList";
+import UserDetail from "./pages/admin/UserDetail";
+import OrderDetail from "./pages/admin/OrderDetail";
+import OrderList from "./pages/admin/OrderList";
 
 
 const appContainer: React.CSSProperties = {
