@@ -10,6 +10,16 @@ import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { UserPanel } from "./pages/UserPanel";
 import { RecoverPassword } from "./pages/RecoverPassword";
+import { Dashboard } from "./pages/admin/Dashboard";
+import { AdminLayout } from "./pages/admin/AdminLayout";
+import { ProductManagement } from "./pages/admin/ProductManagement";
+import { CategoryManagement } from "./pages/admin/CategoryManagement";
+import UserList from "./pages/Admin/UserList";
+import UserDetail from "./pages/Admin/UserDetail";
+import OrderDetail from "./pages/Admin/OrderDetail";
+import OrderList from "./pages/Admin/OrderList";
+
+
 
 const appContainer = {
   minHeight: "100vh",
@@ -103,6 +113,41 @@ export default function App() {
           </div>
         </CartProvider>
       </AuthProvider>
+      <CartProvider>
+        <div style={appContainer}>
+          <header style={headerStyle}>
+            <div style={headerLeft}>
+              <div style={{ fontWeight: 900, fontSize: 18 }}>Tienda de Objetos de Fantasía</div>
+              <div style={{ fontSize: 13, opacity: 0.9 }}>Objetos de prueba</div>
+            </div>
+            <nav style={{ display: "flex", gap: 10 }}>
+              <Link to="/" style={{ color: "#f7efe0", textDecoration: "none", padding: "8px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)" }}>Tienda</Link>
+              <Link to="/checkout" style={{ color: "#f7efe0", textDecoration: "none", padding: "8px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)" }}>Checkout</Link>
+              <Link to="/admin/usuarios" style={{ color: "#f7efe0", textDecoration: "none", padding: "8px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)" }}>Admin</Link>
+            </nav>
+          </header>
+
+          <CartSidebar />
+
+          <main>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/order-complete" element={<OrderComplete />} />
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="products" element={<ProductManagement />} />
+                <Route path="categories" element={<CategoryManagement />} />
+              </Route>
+
+              <Route path="/admin/usuarios" element={<UserList />} />
+              <Route path="/admin/usuarios/:id" element={<UserDetail />} />
+              <Route path="/admin/ordenes" element={<OrderList />} />
+              <Route path="/admin/ordenes/:id" element={<OrderDetail />} />
+            </Routes>
+          </main>
+        </div>
+      </CartProvider>
     </BrowserRouter>
   );
 }

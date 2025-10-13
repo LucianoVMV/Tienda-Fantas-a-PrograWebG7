@@ -1,0 +1,14 @@
+{
+  "name": "tienda-fantasia-backend",
+  "version": "1.0.0",
+  "description": "Servidor para la tienda de fantasía.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
