@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useCart } from "../context/GestionCarrito";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useData } from "../context/DataContext";
 
 interface ShippingData {
   fullName: string;
@@ -14,6 +15,7 @@ interface ShippingData {
 export const Checkout: React.FC = () => {
   const { items, clearCart } = useCart();
   const { user } = useAuth();
+  const { addOrder } = useData();
   const navigate = useNavigate();
 
   const [paymentMethod, setPaymentMethod] = useState<'qr'|'card'>('qr');
@@ -38,6 +40,13 @@ export const Checkout: React.FC = () => {
       setErrors("No hay usuario activo.");
       return;
     }
+    
+    addOrder({
+      cliente: user.name,
+      total: total,
+      estado: "Pendiente",
+      fecha: new Date().toISOString().split('T')[0] // Fecha en formato YYYY-MM-DD
+    });
 
     const order = {
       id: String(Date.now()),
