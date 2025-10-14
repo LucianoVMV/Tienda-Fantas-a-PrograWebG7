@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ProductManagement.css';
 import type { Product } from '../../data/productos';
 
-// Definimos una interface simple para las categorías aquí mismo
+
 interface Category {
   id: number;
   name: string;
@@ -153,7 +153,7 @@ export const ProductManagement: React.FC = () => {
         </tbody>
       </table>
 
-      {/* --- MODAL DE AGREGAR --- */}
+      
       {isAddModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -193,7 +193,7 @@ export const ProductManagement: React.FC = () => {
         </div>
       )}
 
-      {/* --- MODAL DE EDITAR --- */}
+      
       {isEditModalOpen && currentProduct && (
          <div className="modal-overlay">
           <div className="modal-content">

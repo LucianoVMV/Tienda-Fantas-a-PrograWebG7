@@ -1,47 +1,72 @@
-import { useState } from "react";
-import { users as mockUsers } from "../../data/mockData";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+
+interface User {
+  id: number;
+  nombre: string;
+  correo: string;
+  activo: boolean;
+}
+
+const API_URL = "http://localhost:5001/api/admin/users";
+
 export default function UserList() {
-  const [userList, setUserList] = useState(mockUsers);
+  const [userList, setUserList] = useState<User[]>([]);
   const navigate = useNavigate();
 
+  
+  const fetchUsers = () => {
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => setUserList(data));
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  
   const toggleActivo = (id: number) => {
-    setUserList(userList.map(u =>
-      u.id === id ? { ...u, activo: !u.activo } : u
-    ));
+    fetch(`${API_URL}/${id}/toggle`, { method: 'PUT' })
+      .then(res => {
+        if (res.ok) fetchUsers(); 
+      });
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4 text-blue-700">Gestión de Usuarios</h2>
-      <table className="min-w-full border text-left">
+    
+    <div className="product-management">
+      <div className="header-actions">
+        <h1>Gestión de Usuarios</h1>
+      </div>
+      <table className="products-table">
         <thead>
-          <tr className="bg-blue-200">
-            <th className="p-2">ID</th>
-            <th className="p-2">Nombre</th>
-            <th className="p-2">Correo</th>
-            <th className="p-2">Estado</th>
-            <th className="p-2">Acciones</th>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {userList.map((u) => (
-            <tr key={u.id} className="border-b">
-              <td className="p-2">{u.id}</td>
-              <td className="p-2">{u.nombre}</td>
-              <td className="p-2">{u.correo}</td>
-              <td className="p-2">{u.activo ? "Activo" : "Inactivo"}</td>
-              <td className="p-2 space-x-2">
+            <tr key={u.id}>
+              <td>{u.id}</td>
+              <td>{u.nombre}</td>
+              <td>{u.correo}</td>
+              <td>{u.activo ? "Activo" : "Inactivo"}</td>
+              <td className="action-buttons">
                 <button
                   onClick={() => navigate(`/admin/usuarios/${u.id}`)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded"
+                  className="admin-button"
                 >
                   Ver Detalle
                 </button>
                 <button
                   onClick={() => toggleActivo(u.id)}
-                  className={`px-3 py-1 rounded ${u.activo ? "bg-red-400" : "bg-green-400"}`}
+                  className={`admin-button ${u.activo ? "danger" : "success"}`}
                 >
                   {u.activo ? "Desactivar" : "Activar"}
                 </button>
