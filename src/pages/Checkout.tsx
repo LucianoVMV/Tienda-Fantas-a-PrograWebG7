@@ -47,7 +47,7 @@ export const Checkout: React.FC = () => {
       totals: { subtotal, shipping: shippingCost, total }
     };
 
-    
+    // --- Guardar la orden en localStorage ---
     const key = `orders_${user.email}`;
     let savedOrders: any[] = [];
     try {

@@ -1,48 +1,37 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useData } from "../context/DataContext"; // <-- 1. IMPORTAMOS useData
 
-export const Register: React.FC = () => { 
-  const { register } = useAuth(); 
+export const Register: React.FC = () => {
+  const { register } = useAuth();
+  const { addUser } = useData(); // <-- 2. OBTENEMOS LA FUNCIÓN
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    try {
-      
-      const result = await register(name, email, password);
-      
-      if (result.success) {
-        navigate("/panel"); 
-      } else {
-        setError(result.message || "Error en el registro");
-      }
-    } catch (err) {
-      setError("Ocurrió un error inesperado al registrarse.");
+    // La lógica de AuthContext para validar y guardar en localStorage se mantiene
+    const result = await register(name, email, password);
+    
+    if (result.success) {
+      // 3. ADEMÁS, AÑADIMOS EL USUARIO A NUESTRO ESTADO GLOBAL
+      addUser({ nombre: name, correo: email });
+      navigate("/panel");
+    } else {
+      setError(result.message || "Error en el registro");
     }
   };
 
-  
   return (
-    <div
-      style={{
-        maxWidth: 400,
-        margin: "60px auto",
-        background: "#fff8ec",
-        padding: 20,
-        borderRadius: 8,
-        boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-      }}
-    >
+    <div style={{ maxWidth: 400, margin: "60px auto", background: "#fff8ec", padding: 20, borderRadius: 8, boxShadow: "0 2px 5px rgba(0,0,0,0.1)" }}>
+      {/* ... (El JSX se mantiene exactamente igual que el que me pasaste) ... */}
       <h2 style={{ textAlign: "center", color: "#3f2a17" }}>Crear cuenta</h2>
-
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: 12 }}>
           <label>Nombre:</label>
@@ -54,7 +43,6 @@ export const Register: React.FC = () => {
             required
           />
         </div>
-
         <div style={{ marginBottom: 12 }}>
           <label>Correo electrónico:</label>
           <input
@@ -65,7 +53,6 @@ export const Register: React.FC = () => {
             required
           />
         </div>
-
         <div style={{ marginBottom: 12 }}>
           <label>Contraseña:</label>
           <input
@@ -76,13 +63,11 @@ export const Register: React.FC = () => {
             required
           />
         </div>
-
         {error && (
           <div style={{ color: "red", marginBottom: 10, textAlign: "center" }}>
             {error}
           </div>
         )}
-
         <button
           type="submit"
           style={{
@@ -97,7 +82,6 @@ export const Register: React.FC = () => {
         >
           Registrarse
         </button>
-
         <div style={{ marginTop: 8, textAlign: "center" }}>
           <span style={{ fontSize: 14 }}>¿Ya tienes una cuenta? </span>
           <Link to="/" style={{ color: "#3f2a17", fontSize: 14 }}>
