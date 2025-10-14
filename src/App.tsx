@@ -26,6 +26,7 @@ import UserList from "./pages/Admin/UserList";
 import UserDetail from "./pages/Admin/UserDetail";
 import OrderList from "./pages/Admin/OrderList";
 import OrderDetail from "./pages/Admin/OrderDetail";
+import { DataProvider } from './context/DataContext';
 
 
 const appContainer: React.CSSProperties = { };
@@ -55,6 +56,7 @@ export default function App() {
       
       <AuthProvider>
         <CartProvider>
+          <DataProvider>
           <div style={appContainer}>
            
             <header style={headerStyle}>
@@ -97,6 +99,7 @@ export default function App() {
               </Routes>
             </main>
           </div>
+          </DataProvider>
         </CartProvider>
       </AuthProvider>
     </BrowserRouter>

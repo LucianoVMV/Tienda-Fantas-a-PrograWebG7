@@ -1,40 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useData } from '../../context/DataContext'; 
 import './Dashboard.css';
 
-interface SummaryData {
-  totalOrders: number;
-  newUsers: number | string;
-  totalRevenue: number;
-}
-
-const API_URL = 'http://localhost:5001/api/admin/summary';
-
 export const Dashboard: React.FC = () => {
-  const [summary, setSummary] = useState<SummaryData | null>(null);
+  
+  const { orders, users } = useData();
+  
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [loading, setLoading] = useState(true);
 
-  const fetchSummary = (url: string = API_URL) => {
-    setLoading(true);
-    fetch(url)
-      .then(res => res.json())
-      .then(data => setSummary(data))
-      .catch(error => console.error("Error al cargar el resumen:", error))
-      .finally(() => setLoading(false));
-  };
+  
+  const summary = useMemo(() => {
+    let ordersToSummarize = orders;
+    
+    
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayString = `${year}-${month}-${day}`;
 
-  useEffect(() => {
-    fetchSummary(); 
-  }, []);
-
-  const handleFilter = (e: React.FormEvent) => {
-    e.preventDefault();
     if (startDate && endDate) {
-      const filteredUrl = `${API_URL}?from=${startDate}&to=${endDate}`;
-      fetchSummary(filteredUrl);
+      
+      ordersToSummarize = orders.filter(order => order.fecha >= startDate && order.fecha <= endDate);
+    } else {
+      
+      ordersToSummarize = orders.filter(order => order.fecha === todayString);
     }
-  };
+
+    return {
+      totalOrders: ordersToSummarize.length,
+      newUsers: (startDate || endDate) ? 'N/A' : users.length, 
+      totalRevenue: ordersToSummarize.reduce((sum, order) => sum + order.total, 0),
+    };
+  }, [orders, users, startDate, endDate]);
 
   return (
     <div className="admin-dashboard">
@@ -44,21 +43,22 @@ export const Dashboard: React.FC = () => {
       <div className="summary-cards">
         <div className="card">
           <h3 className="card-title">Órdenes</h3>
-          <p className="card-value">{loading ? '...' : summary?.totalOrders}</p>
+          
+          <p className="card-value">{summary.totalOrders}</p>
         </div>
         <div className="card">
           <h3 className="card-title">Usuarios Nuevos</h3>
-          <p className="card-value">{loading ? '...' : summary?.newUsers}</p>
+          <p className="card-value">{summary.newUsers}</p>
         </div>
         <div className="card">
           <h3 className="card-title">Ingresos Totales</h3>
-          <p className="card-value">S/ {loading ? '...' : summary?.totalRevenue.toFixed(2)}</p>
+          <p className="card-value">S/ {summary.totalRevenue.toFixed(2)}</p>
         </div>
       </div>
 
       <div className="admin-section">
         <h2 className="section-title-admin">Seleccionar Período</h2>
-        <form className="period-form" onSubmit={handleFilter}>
+        <form className="period-form" onSubmit={(e) => e.preventDefault()}>
           <div className="form-group">
             <label htmlFor="start-date">Desde:</label>
             <input 
@@ -77,7 +77,7 @@ export const Dashboard: React.FC = () => {
               onChange={e => setEndDate(e.target.value)}
             />
           </div>
-          <button type="submit" className="admin-button">Filtrar</button>
+          
         </form>
       </div>
     </div>

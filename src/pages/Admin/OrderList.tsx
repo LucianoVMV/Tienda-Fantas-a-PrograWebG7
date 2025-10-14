@@ -1,34 +1,16 @@
-import { useState, useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-
-interface Order {
-  id: number;
-  cliente: string;
-  total: number;
-  estado: string;
-  fecha: string;
-}
-
-const API_URL = "http://localhost:5001/api/admin/orders";
-
+import { useData } from "../../context/DataContext";
 export default function OrderList() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const { orders } = useData(); 
   const navigate = useNavigate();
-
-  
-  useEffect(() => {
-    fetch(API_URL)
-      .then(res => res.json())
-      .then(data => setOrders(data));
-  }, []);
   
   return (
-    
-    <div className="product-management">
+    <div className="product-management"> 
       <div className="header-actions">
           <h1>Gestión de Órdenes</h1>
       </div>
-      <table className="products-table">
+      <table className="products-table"> 
         <thead>
           <tr>
             <th>ID</th>

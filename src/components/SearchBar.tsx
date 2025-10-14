@@ -7,8 +7,9 @@ export const SearchBar: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); 
     if (query.trim()) {
+      
       navigate(`/search?query=${query.trim()}`);
     }
   };

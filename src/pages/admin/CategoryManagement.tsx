@@ -1,36 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './CategoryManagement.css';
-
-
-interface Category {
-  id: number;
-  name: string;
-  description: string;
-}
-
-const API_URL = 'http://localhost:5001/api/categories'; 
+import { useData } from '../../context/DataContext'; 
+import type { Category } from '../../data/mockData';
 
 export const CategoryManagement: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
+ 
+  const { categories, addCategory, updateCategory, deleteCategory } = useData();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
-  const fetchCategories = () => {
-    fetch(API_URL)
-      .then(res => res.json())
-      .then(data => setCategories(data));
-  };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
   const resetForm = () => {
-    setName('');
-    setDescription('');
-    setCurrentCategory(null);
+    setName(''); setDescription(''); setCurrentCategory(null);
   };
 
   const openModal = (category: Category | null) => {
@@ -44,39 +27,26 @@ export const CategoryManagement: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const closeModal = () => {
+    setIsModalOpen(false);
+    resetForm();
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const isEditing = currentCategory !== null;
-    const url = isEditing ? `${API_URL}/${currentCategory.id}` : API_URL;
-    const method = isEditing ? 'PUT' : 'POST';
-
-    const response = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, description }),
-    });
-
-    if (response.ok) {
-      fetchCategories();
-      setIsModalOpen(false);
+    if (currentCategory) {
+      updateCategory(currentCategory.id, { name, description });
     } else {
-      console.error("Error al guardar la categoría");
+      addCategory({ name, description });
     }
+    closeModal();
   };
   
-  const handleDelete = async (categoryId: number) => {
+  const handleDelete = (categoryId: number) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
-        const response = await fetch(`${API_URL}/${categoryId}`, {
-            method: 'DELETE',
-        });
-        if (response.ok) {
-            fetchCategories();
-        } else {
-            console.error("Error al eliminar la categoría");
-        }
+        deleteCategory(categoryId);
     }
   };
-
 
   return (
     <div className="category-management">
@@ -111,23 +81,23 @@ export const CategoryManagement: React.FC = () => {
       
       {isModalOpen && (
         <div className="modal-overlay">
-            <div className="modal-content">
-                <h2>{currentCategory ? 'Editar' : 'Agregar'} Categoría</h2>
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>Nombre</label>
-                        <input type="text" value={name} onChange={e => setName(e.target.value)} required />
-                    </div>
-                    <div className="form-group">
-                        <label>Descripción</label>
-                        <textarea value={description} onChange={e => setDescription(e.target.value)}></textarea>
-                    </div>
-                    <div className="modal-actions">
-                        <button type="button" className="admin-button" onClick={() => setIsModalOpen(false)}>Cancelar</button>
-                        <button type="submit" className="admin-button success">Guardar</button>
-                    </div>
-                </form>
-            </div>
+          <div className="modal-content">
+            <h2>{currentCategory ? 'Editar' : 'Agregar'} Categoría</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Nombre</label>
+                <input type="text" value={name} onChange={e => setName(e.target.value)} required />
+              </div>
+              <div className="form-group">
+                <label>Descripción</label>
+                <textarea value={description} onChange={e => setDescription(e.target.value)}></textarea>
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="admin-button" onClick={closeModal}>Cancelar</button>
+                <button type="submit" className="admin-button success">Guardar</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

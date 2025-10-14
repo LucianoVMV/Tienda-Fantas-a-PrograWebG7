@@ -1,75 +1,54 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
-import type { Product } from '../data/productos';
+import { useData } from '../context/DataContext'; 
 import './SearchResults.css';
 
-const API_URL = "http://localhost:5001/api";
 const ITEMS_PER_PAGE = 8; 
 
 export const SearchResults: React.FC = () => {
   const [searchParams] = useSearchParams();
-  
   const query = searchParams.get('query');
   const categoryQuery = searchParams.get('category');
 
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<{name: string}[]>([]);
   
-  
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const { products, categories } = useData();
+
+  const [selectedCategory, setSelectedCategory] = useState<string>(categoryQuery || '');
   const [sortOrder, setSortOrder] = useState<string>('name-asc');
   const [currentPage, setCurrentPage] = useState<number>(1);
-
-  useEffect(() => {
-    
-    Promise.all([
-      fetch(`${API_URL}/products`),
-      fetch(`${API_URL}/categories`)
-    ])
-    .then(async ([productsRes, categoriesRes]) => {
-      const productsData: Product[] = await productsRes.json();
-      const categoriesData = await categoriesRes.json();
-      
-      setAllProducts(productsData);
-      setCategories(categoriesData);
-     
-      if (categoryQuery) {
-        setSelectedCategory(categoryQuery);
-      }
-    })
-    .catch(error => console.error("Error al cargar datos de búsqueda:", error));
-  }, [categoryQuery]); 
   
-  const filteredAndSortedProducts = useMemo(() => {
-    let result = allProducts;
+  
+  useEffect(() => {
+    if (categoryQuery) {
+      setSelectedCategory(categoryQuery);
+    }
+  }, [categoryQuery]);
 
-   
+  const filteredAndSortedProducts = useMemo(() => {
+    let result = products.filter(p => p.isActive !== false);
+
     if (query) {
       const lowerQuery = query.toLowerCase();
-      
-      result = result.filter(p => 
+      result = result.filter(p =>
         p.name.toLowerCase().includes(lowerQuery) ||
         (p.category && p.category.toLowerCase().includes(lowerQuery))
       );
     } else if (selectedCategory) {
-      
       result = result.filter(p => p.category === selectedCategory);
     }
 
-    
     result.sort((a, b) => {
       switch (sortOrder) {
         case 'price-asc': return a.price - b.price;
         case 'price-desc': return b.price - a.price;
         case 'name-desc': return b.name.localeCompare(a.name);
-        default: return a.name.localeCompare(b.name); // name-asc
+        default: return a.name.localeCompare(b.name);
       }
     });
 
     return result;
-  }, [query, allProducts, selectedCategory, sortOrder]);
-  
+  }, [query, products, selectedCategory, sortOrder]);
   
   const totalPages = Math.ceil(filteredAndSortedProducts.length / ITEMS_PER_PAGE);
   const paginatedProducts = filteredAndSortedProducts.slice(
@@ -87,7 +66,7 @@ export const SearchResults: React.FC = () => {
           <h3>Categorías</h3>
           <button onClick={() => setSelectedCategory('')} className={!selectedCategory ? 'active' : ''}>Todas</button>
           {categories.map(cat => (
-            <button key={cat.name} onClick={() => setSelectedCategory(cat.name)} className={selectedCategory === cat.name ? 'active' : ''}>
+            <button key={cat.id} onClick={() => setSelectedCategory(cat.name)} className={selectedCategory === cat.name ? 'active' : ''}>
               {cat.name}
             </button>
           ))}
@@ -112,13 +91,9 @@ export const SearchResults: React.FC = () => {
 
           {totalPages > 1 && (
             <div className="pagination">
-              <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}>
-                Anterior
-              </button>
+              <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}>Anterior</button>
               <span>Página {currentPage} de {totalPages}</span>
-              <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}>
-                Siguiente
-              </button>
+              <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}>Siguiente</button>
             </div>
           )}
         </main>

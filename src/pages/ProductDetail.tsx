@@ -1,35 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import type { Product } from '../data/productos';
+import { useData } from '../context/DataContext'; 
 import { useCart } from '../context/GestionCarrito';
 import './ProductDetail.css';
 
-const API_URL = "http://localhost:5001/api";
-
 export const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<Product | null>(null);
+  const { products } = useData(); 
   const { addToCart } = useCart();
 
-  useEffect(() => {
-    if (id) {
-      
-      fetch(`${API_URL}/products`)
-        .then(res => res.json())
-        .then((products: Product[]) => {
-          const found = products.find(p => p.id === Number(id));
-          setProduct(found || null);
-        });
-    }
-  }, [id]);
+  const product = products.find(p => p.id === Number(id));
 
-  if (!product) return <div className="loading-detail">Cargando artefacto...</div>;
+  if (!product) {
+    return <div className="loading-detail">Artefacto no encontrado...</div>;
+  }
 
   return (
     <div className="product-detail-page">
       <div className="detail-layout">
         <div className="detail-image-container">
-          <img src={product.image} alt={product.name} />
+          <img src={product.image || `https://via.placeholder.com/300x300.png?text=${product.name.replace(/\s/g, '+')}`} alt={product.name} />
         </div>
         <div className="detail-info">
           <h1 className="detail-name">{product.name}</h1>

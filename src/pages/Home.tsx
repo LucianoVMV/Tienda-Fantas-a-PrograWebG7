@@ -1,53 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { ProductCard } from "../components/ProductCard";
 import { SearchBar } from '../components/SearchBar';
 import './Home.css';
-import type { Product } from "../data/productos";
-import { Link } from "react-router-dom"; 
-
-const API_URL = "http://localhost:5001/api";
-
-
-interface Category {
-  id: number;
-  name: string;
-  description: string;
-  isNew?: boolean; 
-}
+import { useData } from "../context/DataContext"; 
+import { Link } from "react-router-dom";
+import type { Category } from "../data/mockData"; 
 
 export const Home: React.FC = () => {
-  const [bestSellers, setBestSellers] = useState<Product[]>([]);
-  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
-  const [featuredCategories, setFeaturedCategories] = useState<Category[]>([]);
-  const [newCategories, setNewCategories] = useState<Category[]>([]);
+  
+  const { products, categories } = useData();
 
-  useEffect(() => {
-    
-    Promise.all([
-      fetch(`${API_URL}/products`),
-      fetch(`${API_URL}/categories`)
-    ])
-    .then(async ([productsRes, categoriesRes]) => {
-      if (!productsRes.ok || !categoriesRes.ok) throw new Error('Error al conectar con el backend');
-      
-      const allProducts: Product[] = await productsRes.json();
-      const allCategories: Category[] = await categoriesRes.json();
-
-      
-      setBestSellers(allProducts.filter(p => p.isBestSeller).slice(0, 12));
-      setNewArrivals(allProducts.filter(p => p.isNew).slice(0, 6));
-      
-      
-      setFeaturedCategories(allCategories.slice(0, 3)); 
-      setNewCategories(allCategories.slice(3, 6));
-
-    })
-    .catch(error => console.error("Error al cargar datos para Home:", error));
-  }, []);
+  
+  const bestSellers = products.filter(p => p.isBestSeller && p.isActive !== false).slice(0, 12);
+  const newArrivals = products.filter(p => p.isNew && p.isActive !== false).slice(0, 6);
+  const featuredCategories = categories.slice(0, 3);
+  const newCategories = categories.slice(3, 6);
 
   return (
     <div className="home-page-final">
-      
       <header className="hero-section">
         <div className="hero-content">
           <h1 className="hero-title">Mercancía mística... garantizamos casi todo</h1>
@@ -56,10 +26,7 @@ export const Home: React.FC = () => {
       </header>
       <SearchBar />
 
-      
       <main className="home-container">
-        
-       
         <section className="home-section">
           <h2 className="home-section-title">Categorías Destacadas</h2>
           <div className="category-grid">
@@ -73,7 +40,6 @@ export const Home: React.FC = () => {
           </div>
         </section>
 
-        
         <section className="home-section">
           <h2 className="home-section-title">Los 12 Ítems Más Vendidos</h2>
           <div className="product-grid-home">
@@ -89,9 +55,7 @@ export const Home: React.FC = () => {
             </div>
         </section>
 
-        
         <div className="bottom-section">
-            
             <section className="home-section">
             <h2 className="home-section-title">Categorías Nuevas</h2>
             <div className="category-grid">
@@ -104,7 +68,6 @@ export const Home: React.FC = () => {
                 ))}
             </div>
             </section>
-
             
             <section className="home-section">
             <h2 className="home-section-title">6 Productos Nuevos</h2>
@@ -115,7 +78,6 @@ export const Home: React.FC = () => {
         </div>
       </main>
 
-      
       <footer className="footer-final">
         <div className="footer-links">
           <Link to="/about">Sobre Nosotros</Link>
