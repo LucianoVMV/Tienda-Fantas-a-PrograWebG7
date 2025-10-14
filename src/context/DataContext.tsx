@@ -28,7 +28,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [users, setUsers] = useState<User[]>(mockUsers);
   const [orders, setOrders] = useState<Order[]>(mockOrders);
 
-  // --- Funciones para modificar los datos ---
+ 
 
   const addProduct = (productData: Omit<Product, 'id' | 'isActive'>) => {
     const newProduct: Product = { id: Date.now(), ...productData, isActive: true };
@@ -57,7 +57,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, estado: 'Cancelada' } : o));
   };
   
-  // --- LÓGICA FINAL PARA AGREGAR USUARIOS Y ÓRDENES ---
+  
   const addUser = (userData: { nombre: string, correo: string }) => {
     const newUser: User = { id: Date.now(), ...userData, activo: true };
     setUsers(prev => [...prev, newUser]);

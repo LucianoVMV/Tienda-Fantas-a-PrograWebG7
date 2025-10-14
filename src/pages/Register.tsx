@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useData } from "../context/DataContext"; // <-- 1. IMPORTAMOS useData
-
+import { useData } from "../context/DataContext";
 export const Register: React.FC = () => {
   const { register } = useAuth();
-  const { addUser } = useData(); // <-- 2. OBTENEMOS LA FUNCIÓN
+  const { addUser } = useData(); 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,11 +15,11 @@ export const Register: React.FC = () => {
     e.preventDefault();
     setError("");
 
-    // La lógica de AuthContext para validar y guardar en localStorage se mantiene
+    
     const result = await register(name, email, password);
     
     if (result.success) {
-      // 3. ADEMÁS, AÑADIMOS EL USUARIO A NUESTRO ESTADO GLOBAL
+      
       addUser({ nombre: name, correo: email });
       navigate("/panel");
     } else {
@@ -30,7 +29,7 @@ export const Register: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 400, margin: "60px auto", background: "#fff8ec", padding: 20, borderRadius: 8, boxShadow: "0 2px 5px rgba(0,0,0,0.1)" }}>
-      {/* ... (El JSX se mantiene exactamente igual que el que me pasaste) ... */}
+      
       <h2 style={{ textAlign: "center", color: "#3f2a17" }}>Crear cuenta</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: 12 }}>

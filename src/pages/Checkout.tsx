@@ -40,12 +40,12 @@ export const Checkout: React.FC = () => {
       setErrors("No hay usuario activo.");
       return;
     }
-    
+
     addOrder({
       cliente: user.name,
       total: total,
       estado: "Pendiente",
-      fecha: new Date().toISOString().split('T')[0] // Fecha en formato YYYY-MM-DD
+      fecha: new Date().toISOString().split('T')[0] 
     });
 
     const order = {
@@ -56,7 +56,7 @@ export const Checkout: React.FC = () => {
       totals: { subtotal, shipping: shippingCost, total }
     };
 
-    // --- Guardar la orden en localStorage ---
+    
     const key = `orders_${user.email}`;
     let savedOrders: any[] = [];
     try {
