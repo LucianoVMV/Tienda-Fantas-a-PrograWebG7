@@ -20,11 +20,12 @@ const panelBase: React.CSSProperties = {
   background: "#f7efe0",
   borderLeft: "4px solid #6b4b2a",
   boxShadow: "-6px 0 18px rgba(0,0,0,0.12)",
-  zIndex: 60,
+  zIndex: 9999,
   display: "flex",
   flexDirection: "column",
   transition: "transform 0.28s ease",
 };
+
 
 export const CartSidebar: React.FC = () => {
   const { isOpen, closeCart, items, removeFromCart, increaseQty, decreaseQty, clearCart } = useCart();
